@@ -1,0 +1,123 @@
+{
+  "info": {
+    "name": "Scheduling API",
+    "_postman_id": "c6d2a1b0-1f8d-4e1e-9b88-aaaa00011122",
+    "description": "Catálogo y agenda multi-tenant",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Catalog - Create Category",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/catalog/categories", "host": ["{{baseUrl}}"], "path": ["catalog","categories"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Manicure\",\n  \"description\": \"Uñas básicas\",\n  \"position\": 1,\n  \"isActive\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Catalog - Create Service",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/catalog/services", "host": ["{{baseUrl}}"], "path": ["catalog","services"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"Manicure clásica\",\n  \"durationMinutes\": 45,\n  \"price\": 20.00,\n  \"preparationTimeMinutes\": 5,\n  \"bufferTimeMinutes\": 10,\n  \"isActive\": true\n}"
+        }
+      }
+    },
+    {
+      "name": "Technicians - Create",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/technicians", "host": ["{{baseUrl}}"], "path": ["technicians"] },
+        "body": { "mode": "raw", "raw": "{\n  \"displayName\": \"Ana\",\n  \"userId\": \"{{userId}}\"\n}" }
+      }
+    },
+    {
+      "name": "Technicians - Assign Services",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/technicians/{{technicianId}}/services", "host": ["{{baseUrl}}"], "path": ["technicians","{{technicianId}}","services"] },
+        "body": { "mode": "raw", "raw": "{ \"serviceIds\": [\"{{serviceId}}\"] }" }
+      }
+    },
+    {
+      "name": "Technicians - Weekly Availability",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/technicians/{{technicianId}}/availability", "host": ["{{baseUrl}}"], "path": ["technicians","{{technicianId}}","availability"] },
+        "body": { "mode": "raw", "raw": "{ \"entries\": [ { \"weekday\": 0, \"start\": \"09:00:00\", \"end\": \"17:00:00\" } ] }" }
+      }
+    },
+    {
+      "name": "Availability - List Slots",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/availability?technicianId={{technicianId}}&serviceId={{serviceId}}&date={{date}}&locationId={{locationId}}&step=15",
+          "host": ["{{baseUrl}}"], "path": ["availability"],
+          "query": [
+            { "key": "technicianId", "value": "{{technicianId}}" },
+            { "key": "serviceId", "value": "{{serviceId}}" },
+            { "key": "date", "value": "{{date}}" },
+            { "key": "locationId", "value": "{{locationId}}" },
+            { "key": "step", "value": "15" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Appointments - Book",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/appointments", "host": ["{{baseUrl}}"], "path": ["appointments"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"businessId\": \"{{businessId}}\",\n  \"locationId\": \"{{locationId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"technicianId\": \"{{technicianId}}\",\n  \"clientId\": \"{{clientId}}\",\n  \"startTime\": \"{{isoStart}}\",\n  \"notes\": \"Traer diseño\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Appointments - Update Status",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/appointments/{{appointmentId}}/status", "host": ["{{baseUrl}}"], "path": ["appointments","{{appointmentId}}","status"] },
+        "body": { "mode": "raw", "raw": "{ \"status\": \"confirmed\", \"notes\": \"Pagado\" }" }
+      }
+    },
+    {
+      "name": "Reviews - Create",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/reviews", "host": ["{{baseUrl}}"], "path": ["reviews"] },
+        "body": { "mode": "raw", "raw": "{ \"appointmentId\": \"{{appointmentId}}\", \"serviceId\": \"{{serviceId}}\", \"reviewerId\": \"{{clientId}}\", \"rating\": 5, \"comment\": \"Excelente\" }" }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "REPLACE_ME" },
+    { "key": "businessId", "value": "" },
+    { "key": "locationId", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "serviceId", "value": "" },
+    { "key": "technicianId", "value": "" },
+    { "key": "clientId", "value": "" },
+    { "key": "appointmentId", "value": "" },
+    { "key": "date", "value": "2025-10-01" },
+    { "key": "isoStart", "value": "2025-10-01T14:00:00.000Z" },
+    { "key": "userId", "value": "" }
+  ]
+}
