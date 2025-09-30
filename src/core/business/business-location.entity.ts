@@ -23,25 +23,12 @@ export class BusinessLocation extends SoftDeletableEntity {
   @IsString()
   @Length(1, 200)
   addressLine1!: string;
-
-  @Column({
-    name: 'address_line2',
-    type: 'varchar',
-    length: 200,
-    nullable: true,
-  })
-  @IsOptional()
-  @IsString()
   addressLine2?: string | null;
 
   @Column({ length: 100 })
   @IsString()
   @Length(1, 100)
   city!: string;
-
-  @Column({ length: 100, nullable: true })
-  @IsOptional()
-  @IsString()
   state?: string | null;
 
   @Column({ name: 'postal_code', length: 20, nullable: true })

@@ -2,12 +2,6 @@ import 'dotenv/config';
 import { fileURLToPath } from 'node:url';
 import { DataSource } from 'typeorm';
 
-const getImportMetaUrl = (): string => (0, eval)('import.meta.url') as string;
-
-const currentFile =
-  typeof __filename === 'string'
-    ? __filename
-    : fileURLToPath(getImportMetaUrl());
 const isTsEnv = currentFile.endsWith('.ts');
 const rootDir = isTsEnv ? 'src' : 'dist';
 const fileExtension = isTsEnv ? 'ts' : 'js';
