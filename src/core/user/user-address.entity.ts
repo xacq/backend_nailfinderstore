@@ -33,7 +33,7 @@ export class UserAddress extends TimestampedEntity {
   @IsString() @Length(1,100)
   city!: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   @IsOptional() @IsString()
   state?: string | null;
 
