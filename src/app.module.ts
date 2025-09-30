@@ -23,7 +23,7 @@ import { SchedulingModule } from './modules/scheduling/scheduling.module';
         autoLoadEntities: true,
         synchronize: false,
         migrationsRun: false,
-        migrations: ['dist/migrations/*.js'],
+        migrations: ['dist/**/migrations/*.js'],
       }),
     }),
     SchedulingModule,

@@ -1,7 +1,7 @@
 // src/modules/scheduling/appointments/services/appointments.service.ts
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, IsNull, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { Appointment } from '../entities/appointment.entity';
 import { AppointmentStatusHistory } from '../entities/appointment-status-history.entity';
 import { Service } from '../../catalog/entities/service.entity';
