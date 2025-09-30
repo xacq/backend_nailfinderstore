@@ -1,7 +1,9 @@
 import 'dotenv/config';
+import { fileURLToPath } from 'node:url';
 import { DataSource } from 'typeorm';
 
-const isTsEnv = __filename.endsWith('.ts');
+const currentFile = fileURLToPath(import.meta.url);
+const isTsEnv = currentFile.endsWith('.ts');
 const rootDir = isTsEnv ? 'src' : 'dist';
 const fileExtension = isTsEnv ? 'ts' : 'js';
 
