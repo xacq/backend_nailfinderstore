@@ -1,7 +1,14 @@
 import 'dotenv/config';
+import { fileURLToPath } from 'node:url';
 import { DataSource } from 'typeorm';
 
-const isTsEnv = __filename.endsWith('.ts');
+const getImportMetaUrl = (): string => (0, eval)('import.meta.url') as string;
+
+const currentFile =
+  typeof __filename === 'string'
+    ? __filename
+    : fileURLToPath(getImportMetaUrl());
+const isTsEnv = currentFile.endsWith('.ts');
 const rootDir = isTsEnv ? 'src' : 'dist';
 const fileExtension = isTsEnv ? 'ts' : 'js';
 
@@ -13,7 +20,7 @@ const AppDataSource = new DataSource({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   entities: [rootDir + '/**/*.entity.' + fileExtension],
-  migrations: [rootDir + '/migrations/*.' + fileExtension],
+  migrations: [rootDir + '/**/migrations/*.' + fileExtension],
   synchronize: false,
   migrationsRun: false,
 });
