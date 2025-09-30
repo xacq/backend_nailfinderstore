@@ -2,21 +2,23 @@
 
 Este documento resume el estado actual del backend (NestJS + TypeORM) incluido en este repositorio y cómo se relaciona con el esquema MySQL publicado en [`xacq/nailfinderstore`](https://github.com/xacq/nailfinderstore/blob/main/db/schema.sql). Su objetivo es ayudar a sincronizar el trabajo del frontend con las capacidades reales del backend.
 
-## Stack y configuración general
+## Stack y bootstrap
 
 - **Framework**: NestJS con TypeScript.
-- **ORM**: TypeORM configurado para MySQL. Las entidades se cargan dinámicamente desde `src/**/*.entity.ts` y se ejecutan migraciones manuales; `synchronize` está deshabilitado. La configuración espera variables de entorno `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS` y `DB_NAME`.【F:src/data-source.ts†L1-L21】
+- **Configuración principal**: `AppModule` solo registra `ConfigModule` y `TypeOrmModule` con `autoLoadEntities`, sin importar módulos de dominio adicionales.【F:src/app.module.ts†L1-L29】
+- **Controlador expuesto**: `AppController` conserva el endpoint de ejemplo `GET /` que devuelve `"Hello World!"`, por lo que actualmente no existe una API funcional para el frontend.【F:src/app.controller.ts†L1-L12】【F:src/app.service.ts†L1-L8】
+- **Datasource CLI**: existe un `DataSource` independiente para ejecutar migraciones o scripts con TypeORM en modo CLI.【F:src/data-source.ts†L1-L21】
 - **Entidades base**: Se hereda de `TimestampedEntity` (UUID + columnas `created_at` / `updated_at`) y opcionalmente de `SoftDeletableEntity` (añade `deleted_at`).【F:src/modules/scheduling/base/timestamped.entity.ts†L1-L12】【F:src/core/base/soft-deletable.entity.ts†L1-L8】
 
-> ⚠️ Actualmente no existen módulos, controladores ni resolvers expuestos; el backend solo define entidades y algunos servicios de dominio. Para que el frontend pueda consumir datos será necesario crear controladores/rest endpoints o GraphQL resolvers que utilicen estas entidades y servicios.
+> ⚠️ Aunque el directorio `src/modules/scheduling` contiene entidades y servicios de dominio, no hay módulos, controladores ni resolvers conectados al árbol de Nest. Para que el frontend pueda consumir datos será necesario crear controladores o GraphQL resolvers que utilicen estas piezas.
 
 ## Cobertura del esquema
 
 ### Núcleo de negocio y usuarios
 
-| Tabla (schema.sql) | Estado en el backend |
+| Tabla (`schema.sql`) | Estado en el backend |
 | --- | --- |
-| `businesses` | Implementada como entidad `Business` (incluye relaciones con ubicaciones, usuarios y rbac).【F:src/core/business/business.entity.ts†L1-L52】 |
+| `businesses` | Implementada como entidad `Business` (incluye relaciones con ubicaciones, usuarios y RBAC).【F:src/core/business/business.entity.ts†L1-L52】 |
 | `business_locations` | Implementada como `BusinessLocation`, con soporte para soft-delete y banderas `is_default`/`is_active`.【F:src/core/business/business-location.entity.ts†L1-L48】 |
 | `roles` | Implementada como `Role`.【F:src/core/rbac/role.entity.ts†L1-L18】 |
 | `users` | Implementada como `User`, enlazando con `Business`, `UserProfile`, direcciones y RBAC.【F:src/core/user/user.entity.ts†L1-L52】 |
@@ -29,17 +31,17 @@ Este documento resume el estado actual del backend (NestJS + TypeORM) incluido e
 
 | Tabla | Estado |
 | --- | --- |
-| `service_categories` | Entidad `ServiceCategory` (relación con negocio, `position`, `is_active`).【F:src/modules/scheduling/catalog/entities/service-category.entity.ts†L1-L18】 |
+| `service_categories` | Entidad `ServiceCategory` (relación con negocio, `position`, `is_active`).【F:src/modules/scheduling/catalog/entities/service-category.entity.ts†L1-L19】 |
 | `services` | Entidad `Service` con campos de duración, precio y tiempos de preparación/buffer. Soft delete soportado.【F:src/modules/scheduling/catalog/entities/service.entity.ts†L1-L27】 |
 | `technicians` | Entidad `Technician` con `display_name`, bio y rating promedio. Relación opcional a `users`.【F:src/modules/scheduling/technicians/entities/technician.entity.ts†L1-L24】 |
 | `technician_services` | Entidad `TechnicianService` con clave primaria compuesta (sin timestamps).【F:src/modules/scheduling/technicians/entities/technician-service.entity.ts†L1-L19】 |
-| `business_hours` | Entidad `BusinessHour` manejada por `BusinessHoursService.upsertDay`.【F:src/modules/scheduling/technicians/entities/business-hour.entity.ts†L1-L23】【F:src/modules/scheduling/technicians/services/business-hours.service.ts†L1-L17】 |
+| `business_hours` | Entidad `BusinessHour` manejada por `BusinessHoursService.upsertDay`.【F:src/modules/scheduling/technicians/entities/business-hour.entity.ts†L1-L23】【F:src/modules/scheduling/technicians/services/business-hours.service.ts†L1-L23】 |
 | `technician_availability` | Entidad `TechnicianAvailability`.【F:src/modules/scheduling/technicians/entities/technician-availability.entity.ts†L1-L16】 |
 | `appointments` | Entidad `Appointment` con estados y campos de cancelación. Falta implementar servicios/controladores para CRUD y lógica de disponibilidad.【F:src/modules/scheduling/appointments/entities/appointment.entity.ts†L1-L38】 |
 | `appointment_status_history` | Entidad `AppointmentStatusHistory`.【F:src/modules/scheduling/appointments/entities/appointment-status-history.entity.ts†L1-L23】 |
 | `service_reviews` | Entidad `ServiceReview`.【F:src/modules/scheduling/appointments/entities/service-review.entity.ts†L1-L21】 |
 
-El servicio `TechniciansService` permite crear técnicos y asignar servicios (sobrescribiendo la relación N:M).【F:src/modules/scheduling/technicians/services/technicians.service.ts†L1-L22】
+El servicio `TechniciansService` permite crear técnicos y asignar servicios (sobrescribiendo la relación N:M).【F:src/modules/scheduling/technicians/services/technicians.service.ts†L1-L24】
 
 ### Elementos aún no modelados
 
